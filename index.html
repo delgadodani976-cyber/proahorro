@@ -606,7 +606,7 @@
         <h3 style="margin-top:10px">ProAhorro</h3>
         <p class="hint">Pequeños ahorros, grandes metas.</p>
         <div style="text-align:left;margin-top:14px">
-          <div class="kv"><span>Versión</span><b>2.18</b></div>
+          <div class="kv"><span>Versión</span><b>2.19</b></div>
           <div class="kv"><span>Autor</span><b class="autor-nombre">Raysa / DDC</b></div>
         </div>
         <label class="lbl" style="text-align:left">Características</label>
@@ -1660,6 +1660,7 @@
         $("celebvid-bg").classList.add("open");
         try {
           v.src = src; v.muted = false;
+          v.onended = function () { setTimeout(closeVideoCeleb, 400); };
           var pr = v.play();
           if (pr && pr.catch) pr.catch(function () { try { v.muted = true; v.play(); } catch (e) {} });
         } catch (e) {}
@@ -1888,7 +1889,7 @@
       })();
 
       /* ============ Actualizaciones (aviso de versión nueva) ============ */
-      var PA_VC = 26, updPendiente = null, updEsperando = false, updMostrado = false;
+      var PA_VC = 27, updPendiente = null, updEsperando = false, updMostrado = false;
       function updMostrar(d) {
         updPendiente = d;
         var sp = $("splash");
