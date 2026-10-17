@@ -1,5 +1,5 @@
 /* ProAhorro web — cache del esqueleto de la app */
-var CACHE = "proahorro-web-v4";
+var CACHE = "proahorro-web-v5";
 var FILES = ["./", "./index.html", "./manifest.webmanifest", "./Icono%20180%20(1).png", "./Icono%20192.png", "./Icono%20512%20(1).png"];
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) {
