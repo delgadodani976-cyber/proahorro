@@ -1,6 +1,6 @@
 {
-  "codigo": 23,
-  "nombre": "2.15",
-  "notas": "Nueva: la app avisa automáticamente cuando haya una versión nueva.",
+  "codigo": 24,
+  "nombre": "2.16",
+  "notas": "Versión de prueba del sistema de avisos de ProAhorro.",
   "url": "https://raw.githubusercontent.com/delgadodani976-cyber/proahorro/main/ProAhorro.apk"
 }
