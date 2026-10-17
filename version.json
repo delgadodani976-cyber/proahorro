@@ -1,6 +1,6 @@
 {
-  "codigo": 23,
-  "nombre": "2.15",
-  "notas": "Versión actual de ProAhorro, con el sistema de avisos de actualización activado.",
-  "url": "https://raw.githubusercontent.com/delgadodani976-cyber/proahorro/main/ProAhorro%20(1).apk"
+  "codigo": 25,
+  "nombre": "2.17",
+  "notas": "Nuevo: calendario real con tus días de aporte, y el instalador se abre solo al terminar la descarga.",
+  "url": "https://raw.githubusercontent.com/delgadodani976-cyber/proahorro/main/ProAhorro.apk"
 }
