@@ -3,6 +3,5 @@
   "nombre": "3.4",
   "notas": "Versión lista para la tienda: permisos mínimos explicados dentro de la app y política de privacidad. Incluye el permiso de primera vez del bloqueo, el diseño 3.0 y los perfiles.",
   "url": "https://raw.githubusercontent.com/delgadodani976-cyber/proahorro/main/ProAhorro-v3.4.apk",
-  "bloqueo": true,
-  "mensajeBloqueo": "Prueba de bloqueo remoto hecha por el dueño de la app. Todo está en orden: tus datos están a salvo."
+  "bloqueo": false
 }
