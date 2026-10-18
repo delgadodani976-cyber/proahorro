@@ -205,6 +205,11 @@
   .cal-ring{display:inline-block;width:9px;height:9px;border-radius:3px;box-shadow:inset 0 0 0 2px var(--blue);vertical-align:middle;margin-right:4px}
   .cal-next{margin:12px 0;font-weight:600}
   .modal-bg{position:fixed;inset:0;background:rgba(6,25,40,.6);z-index:70;display:none;align-items:center;justify-content:center;padding:18px}
+  #block-bg{position:fixed;inset:0;z-index:500;background:#071a3a;color:#fff;display:none;align-items:center;justify-content:center;text-align:center;padding:24px}
+  #block-bg.open{display:flex}
+  #block-bg .block-emo{font-size:54px}
+  #block-bg h2{margin:10px 0 6px;font-size:22px}
+  #block-bg p{color:#b9c8dc;margin:0}
   .modal-bg.open{display:flex}
   .modal{background:var(--surface);border-radius:22px;padding:26px 22px;max-width:420px;width:100%;text-align:center;box-shadow:var(--shadow)}
   .modal .emo{font-size:64px;display:block;animation:pop .6s ease}
@@ -690,7 +695,7 @@
         <h3 style="margin-top:10px">ProAhorro</h3>
         <p class="hint">Pequeños ahorros, grandes metas.</p>
         <div style="text-align:left;margin-top:14px">
-          <div class="kv"><span>Versión</span><b>3.4</b></div>
+          <div class="kv"><span>Versión</span><b>3.5</b></div>
           <div class="kv"><span>Autor</span><b class="autor-nombre">Raysa / DDC</b></div>
         </div>
         <label class="lbl" style="text-align:left">Características</label>
@@ -714,6 +719,7 @@
           <p class="hint">👥 Varios planes como perfiles, con pantalla de bienvenida que no muestra tu saldo</p>
           <p class="hint">🎨 Diseño 3.0: anillo de progreso, plan paso a paso e historial agrupado por días</p>
           <p class="hint">🔢 PIN propio de la app si el teléfono no tiene bloqueo</p>
+          <p class="hint">🚫 Bloqueo remoto a petición del dueño: si tu teléfono se pierde, la app se puede bloquear para que nadie la use (tus datos no se borran)</p>
         </div>
         <label class="lbl" style="text-align:left">Actualizaciones</label>
         <div style="text-align:left">
@@ -779,6 +785,14 @@
 </div>
 
 <!-- Confirmación de registro -->
+<div id="block-bg">
+  <div>
+    <div class="block-emo">🚫</div>
+    <h2>Aplicación bloqueada</h2>
+    <p id="block-msg">Esta aplicación fue bloqueada por su administrador. Si eres el dueño, pide que la desbloqueen.</p>
+  </div>
+</div>
+
 <div class="modal-bg" id="lockconsent-bg">
   <div class="modal">
     <span class="emo">🔐</span>
@@ -970,6 +984,9 @@
         "🔓 Desactivado": "🔓 Off", "🔒 Activado": "🔒 On",
         "Al abrir la app se pedirá tu huella, rostro o el PIN del teléfono. La huella necesita Android 9 o más nuevo; el PIN o patrón funciona desde Android 7. Si tu teléfono no tiene ninguno, crea un PIN solo para la app.": "Opening the app will ask for your fingerprint, face, or phone PIN. Fingerprint needs Android 9 or newer; PIN or pattern works from Android 7. If your phone has none of those, create an app-only PIN.",
         "🔢 PIN propio de la app si el teléfono no tiene bloqueo": "🔢 App PIN if the phone has no lock set",
+        "Aplicación bloqueada": "App blocked",
+        "Esta aplicación fue bloqueada por su administrador. Si eres el dueño, pide que la desbloqueen.": "This app was blocked by its administrator. If you are the owner, ask for it to be unblocked.",
+        "🚫 Bloqueo remoto a petición del dueño: si tu teléfono se pierde, la app se puede bloquear para que nadie la use (tus datos no se borran)": "🚫 Remote block at the owner's request: if your phone is lost, the app can be blocked so nobody can use it (your data is not erased)",
         "🛡️ Eso es todo: la app pide únicamente los permisos que usa, en el momento en que los necesita, y antes de usar la huella o el PIN te pide tu permiso la primera vez.": "🛡️ That's all: the app only requests the permissions it uses, at the moment it needs them, and it asks for your permission the first time before using fingerprint or PIN.",
         "📄 Privacidad: tus datos nunca salen de tu teléfono (sin servidores, sin anuncios, sin rastreadores). La política de privacidad completa acompaña al código de la app.": "📄 Privacy: your data never leaves your phone (no servers, no ads, no trackers). The full privacy policy ships with the app code.",
         "Compartir mi registro": "Share my record", "Enviarlo por WhatsApp": "Send it via WhatsApp",
@@ -2281,6 +2298,26 @@
       if (paRestore()) { registrationMode = "edit"; showProfiles(); }
       else showAuth();
 
+      /* ============ Bloqueo remoto: estado al arrancar ============
+         Aplica el último estado conocido de inmediato. En web/iPhone (sin
+         puente nativo) consulta el manifiesto directamente; en Android el
+         lado nativo hace lo mismo con su propia copia del estado. */
+      (function () {
+        try {
+          if (localStorage.getItem("proahorro_blocked") === "1") {
+            var bm = localStorage.getItem("proahorro_blocked_msg");
+            if (bm) $("block-msg").textContent = bm;
+            $("block-bg").classList.add("open");
+          }
+        } catch (e) {}
+        if (!(window.AndroidBridge && AndroidBridge.buscarActualizacion) && window.fetch) {
+          fetch("https://raw.githubusercontent.com/delgadodani976-cyber/proahorro/main/version.json", { cache: "no-store" })
+            .then(function (r) { return r.json(); })
+            .then(function (d) { paApplyBlock(d); })
+            .catch(function () {});
+        }
+      })();
+
       /* ============ Bienvenida (logo transparente, en cada apertura) ============ */
       (function () {
         var sp = $("splash"), im = $("splash-img");
@@ -2303,7 +2340,7 @@
       })();
 
       /* ============ Actualizaciones (aviso de versión nueva) ============ */
-      var PA_VC = 37, updPendiente = null, updEsperando = false, updMostrado = false;
+      var PA_VC = 38, updPendiente = null, updEsperando = false, updMostrado = false;
       function updMostrar(d) {
         updPendiente = d;
         var sp = $("splash");
@@ -2313,9 +2350,34 @@
         $("upd-text").textContent = tx("Ya está disponible ProAhorro " + (d.nombre || "") + ".", "ProAhorro " + (d.nombre || "") + " is now available.") + (d.notas ? " " + d.notas : "");
         $("upd-bg").classList.add("open");
       }
+      // ============ Bloqueo remoto (interruptor del administrador) ============
+      // El manifiesto trae "bloqueo": true/false. Al activarse, la app se cubre
+      // con la pantalla de bloqueo; los datos NO se borran. Si la red falla,
+      // manda el último estado conocido: un error de red nunca bloquea a nadie.
+      function paApplyBlock(d) {
+        try {
+          if (!d || typeof d.bloqueo === "undefined") return;
+          var bg = $("block-bg");
+          if (d.bloqueo) {
+            try {
+              localStorage.setItem("proahorro_blocked", "1");
+              localStorage.setItem("proahorro_blocked_msg", d.mensajeBloqueo || "");
+            } catch (e) {}
+            if (d.mensajeBloqueo) $("block-msg").textContent = d.mensajeBloqueo;
+            if (bg) bg.classList.add("open");
+          } else {
+            try {
+              localStorage.removeItem("proahorro_blocked");
+              localStorage.removeItem("proahorro_blocked_msg");
+            } catch (e) {}
+            if (bg) bg.classList.remove("open");
+          }
+        } catch (e) {}
+      }
       window.__paUpdate = function (json) {
         var d = null;
         try { d = JSON.parse(json); } catch (e) {}
+        if (d) paApplyBlock(d);
         if (d && d.codigo && +d.codigo > PA_VC) updMostrar(d);
         else if (updEsperando) {
           updEsperando = false;
